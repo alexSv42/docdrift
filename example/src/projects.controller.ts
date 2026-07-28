@@ -20,7 +20,7 @@ import type {
   UpdateProjectDto,
 } from './dto.js';
 
-@Controller('v2/projects')
+@Controller('v4/projects')
 @UseGuards(BearerAuthGuard)
 export class ProjectsController {
   constructor(private readonly projects: ProjectsService) {}
