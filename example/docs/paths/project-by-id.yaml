@@ -1,0 +1,46 @@
+# Partial: the /projects/{id} operations.
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+get:
+  operationId: getProject
+  summary: Get a project
+  responses:
+    '200':
+      description: The project.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/project.yaml'
+patch:
+  operationId: updateProject
+  summary: Update a project
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            status:
+              $ref: '../components/schemas/project-status.yaml'
+            archived:
+              type: boolean
+  responses:
+    '200':
+      description: The updated project.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/project.yaml'
+delete:
+  operationId: deleteProject
+  summary: Delete a project
+  responses:
+    '204':
+      description: The project was deleted.

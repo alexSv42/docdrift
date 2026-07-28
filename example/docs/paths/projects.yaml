@@ -1,0 +1,58 @@
+# Partial: the /projects collection operations. No `openapi:` key, so this is a fragment, not a
+# document — `redocly lint` on this file alone exits non-zero with "Unsupported specification".
+post:
+  operationId: createProject
+  summary: Create a project
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [name, ownerEmail]
+          properties:
+            name:
+              type: string
+            ownerEmail:
+              type: string
+            status:
+              $ref: '../components/schemas/project-status.yaml'
+  responses:
+    '201':
+      description: The created project.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/project.yaml'
+get:
+  operationId: listProjects
+  summary: List projects
+  parameters:
+    - name: status
+      in: query
+      schema:
+        $ref: '../components/schemas/project-status.yaml'
+    - name: limit
+      in: query
+      description: Page size, 1-100.
+      schema:
+        type: integer
+        default: 20
+    - name: cursor
+      in: query
+      schema:
+        type: string
+  responses:
+    '200':
+      description: A page of projects.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../components/schemas/project.yaml'
+              nextCursor:
+                type: [string, 'null']
