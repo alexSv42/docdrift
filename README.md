@@ -17,7 +17,7 @@ docdrift [options]
   --code   <dir>   source directory to read the true API from   (default example/src)
   --docs   <dir>   documentation directory to correct           (default example/docs)
   --rules  <file>  extra compliance rules for the agents        (default rules.md)
-  --model  <id>    AI Gateway model id                          (default google/gemini-3-flash)
+  --model  <id>    AI Gateway model id                          (default google/gemini-2.5-flash)
   --dry-run        print the proposed pull request, change nothing
 ```
 

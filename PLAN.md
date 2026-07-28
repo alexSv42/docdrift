@@ -33,8 +33,10 @@ The pipeline is a real loop, not one `generateText()`:
 2. **Validator → Fixer** is a repair loop. If `redocly lint` rejects the spec the agent
    just edited, the errors go back to the Fixer. Bounded retries, then give up and report.
 
-Cheap models where the task is mechanical (Scanner), stronger where judgement is
-needed (Auditor, Fixer). Configurable per agent.
+One model for all four agents (`google/gemini-2.5-flash`), overridable with `--model`.
+Splitting tiers per agent — cheap for the mechanical Scanner, stronger for the Auditor and
+Fixer — is a one-line change in each agent, but not worth the config surface until a run
+actually shows a quality or cost problem.
 
 ## Phases
 

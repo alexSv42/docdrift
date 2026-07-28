@@ -2,7 +2,7 @@ import { gateway } from '@ai-sdk/gateway';
 import type { LanguageModel, ProviderMetadata } from 'ai';
 
 /** One model for every agent by default; override per run with `--model`. */
-export const DEFAULT_MODEL = 'google/gemini-3-flash';
+export const DEFAULT_MODEL = 'google/gemini-2.5-flash';
 
 export const model = (id: string): LanguageModel => gateway(id);
 
