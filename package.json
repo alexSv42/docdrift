@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "bin": { "docdrift": "./src/cli.ts" },
+  "bin": {
+    "docdrift": "./src/cli.ts"
+  },
   "scripts": {
     "docdrift": "tsx --env-file-if-exists=.env src/cli.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/cost.test.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^2",
@@ -18,6 +20,7 @@
     "@redocly/cli": "^2",
     "@types/node": "^24",
     "tsx": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

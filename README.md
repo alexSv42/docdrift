@@ -163,5 +163,15 @@ Deliberate, and worth knowing before you point this at a monorepo:
 
 ```bash
 npm run typecheck   # tsc --noEmit, strict
-npm test            # cost-ledger assertions
+npm test            # vitest run
 ```
+
+Nine unit tests over the two pieces of non-obvious deterministic logic. No mocked LLM calls —
+the agents are prompts, and asserting on a stubbed model response would only test the stub.
+
+- `src/llm.test.ts` — the cost ledger. The one that matters is *bills a tool loop per step*: a
+  multi-step result reports only the last step's cost in its own `providerMetadata`, so billing
+  the result once would silently undercount the Fixer. The ledger is module state by design, so
+  each test re-imports the module via `vi.resetModules()` rather than have production code export
+  a reset that only tests would call.
+- `src/agents.test.ts` — `readFiles`: recursion, relative paths, multiple extensions, no match.
