@@ -74,7 +74,7 @@ function printCosts(): void {
         `$${row.usd.toFixed(4)}`,
     );
   }
-  console.log(`  ${'TOTAL'.padEnd(9)} ${' '.repeat(31)}$${totalUsd().toFixed(4)}`);
+  console.log(`  ${'TOTAL'.padEnd(9)} ${' '.repeat(33)}$${totalUsd().toFixed(4)}`);
   console.log(`  runtime ${((Date.now() - started) / 1000).toFixed(1)}s`);
 }
 

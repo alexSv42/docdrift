@@ -137,7 +137,7 @@
   <h2>The solution</h2>
   <p>
     docdrift closes the loop. Point it at your code and your docs, and a team of specialised
-    agents does the job a diligent technical writer would do, on every commit, in under a minute.
+    agents does the job a diligent technical writer would do, on every commit, in about a minute.
   </p>
 
   <div class="cols">
@@ -182,25 +182,28 @@ npx docdrift <span class="k">--code</span> ./src <span class="k">--docs</span> .
   <p>A run tells you exactly what it is doing, and what it cost:</p>
 
 <pre><code><span class="c">[0.0s]</span> Scanner: reading 4 source files…
-<span class="c">[3.1s]</span> Scanner: found 5 endpoints, 4 models
-<span class="c">[3.1s]</span> Auditor: comparing against 3 doc files…
-       <span style="color:#dfc726">high</span>   api-reference.md: documents /v1/projects, code serves /v2/projects
-       <span style="color:#dfc726">high</span>   api-reference.md: DELETE /v2/projects/{id} is not documented
-       <span style="color:#dfc726">high</span>   getting-started.md: shows X-Api-Key, code requires Authorization: Bearer
-       <span style="color:#dfc726">medium</span> openapi.yaml: query parameter perPage was renamed to limit
-       <span style="color:#dfc726">medium</span> openapi.yaml: field isArchived was renamed to archived
-<span class="c">[8.4s]</span> Fixer: rewriting docs…
-<span class="c">[24.7s]</span> Validator: redocly lint example/docs/openapi.yaml
-<span class="c">[26.0s]</span> Fixer: updated 3 files
-<span class="c">[29.8s]</span> Pull request opened: <span class="s">https://github.com/acme/api/pull/482</span>
+<span class="c">[5.5s]</span> Scanner: found 5 endpoints, 5 models
+<span class="c">[5.5s]</span> Auditor: comparing against 3 doc files…
+       <span style="color:#dfc726">high</span>   api-reference.md: paths use /v1/projects, the true API uses /v2/projects
+       <span style="color:#dfc726">high</span>   api-reference.md: create table omits required field ownerEmail
+       <span style="color:#dfc726">high</span>   getting-started.md: shows X-Api-Key, the API requires Authorization: Bearer
+       <span style="color:#dfc726">medium</span> openapi.yaml: query parameter perPage should be limit
+       <span style="color:#dfc726">medium</span> openapi.yaml: Project schema uses isArchived instead of archived
+       <span style="color:#dfc726">low</span>    api-reference.md: DELETE /v2/projects/{id} is not documented at all
+       <span class="c">…13 more…</span>
+<span class="c">[26.0s]</span> Fixer: rewriting docs…
+<span class="c">[53.5s]</span> Validator: redocly lint example/docs/openapi.yaml
+<span class="c">[54.9s]</span> Fixer: updated 3 files
+<span class="c">[54.9s]</span> Reporter: writing the pull request…
+<span class="c">[65.9s]</span> Pull request opened: <span class="s">https://github.com/acme/api/pull/482</span>
 
 Token usage and cost
-  scanner    1 calls     4812 in     684 out  $0.0044
-  auditor    1 calls     7106 in    1592 out  $0.0083
-  fixer      4 calls    18240 in    5311 out  $0.0250
-  reporter   1 calls     3970 in     742 out  $0.0042
-  TOTAL                                       $0.0419
-  runtime 29.8s</code></pre>
+  scanner    1 calls     2795 in     598 out  $0.0116
+  auditor    1 calls     3672 in    2320 out  $0.0305
+  fixer      3 calls    16081 in    3015 out  $0.0623
+  reporter   1 calls     5960 in     841 out  $0.0203
+  TOTAL                                       $0.1248
+  runtime 66.0s</code></pre>
 
   <p>
     Add it to CI and drift never reaches your main branch. docdrift exits non-zero when it finds
@@ -218,7 +221,7 @@ Token usage and cost
       <tr><td>Your rules, enforced</td><td>Drop a <code>rules.md</code> in your repo — required curl examples, no literal tokens, typed field tables — and the agents apply your house style, not a vendor's.</td></tr>
       <tr><td>Valid specifications</td><td>Redocly CLI gates every specification edit. A broken OpenAPI document never reaches your reviewers.</td></tr>
       <tr><td>Costs you can see</td><td>Token usage and dollar cost per agent, printed at the end of every run. No surprise invoice.</td></tr>
-      <tr><td>Fast enough to run often</td><td>Under a minute on a typical service, for roughly four cents.</td></tr>
+      <tr><td>Fast enough to run often</td><td>About a minute on a service-sized repository, for roughly ten cents.</td></tr>
     </tbody>
   </table>
 </section>

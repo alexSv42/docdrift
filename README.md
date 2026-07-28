@@ -17,12 +17,50 @@ docdrift [options]
   --code   <dir>   source directory to read the true API from   (default example/src)
   --docs   <dir>   documentation directory to correct           (default example/docs)
   --rules  <file>  extra compliance rules for the agents        (default rules.md)
-  --model  <id>    AI Gateway model id                          (default google/gemini-2.5-flash)
+  --model  <id>    AI Gateway model id                          (default anthropic/claude-sonnet-5)
   --dry-run        print the proposed pull request, change nothing
 ```
 
 Exit codes: `0` docs are clean · `1` drift was found · `2` the run failed.
 Non-zero-on-drift makes it behave like any other linter in CI.
+
+### A real run
+
+Against the deliberately drifted `example/`, 19 findings in 66 seconds for 12 cents:
+
+```
+[0.0s]  Scanner: reading 4 source files…
+[5.5s]  Scanner: found 5 endpoints, 5 models
+[5.5s]  Auditor: comparing against 3 doc files…
+  high   api-reference.md: Base URL and all endpoint paths use /v1/projects, but the true API uses /v2/projects.
+  high   api-reference.md: Authentication example uses 'X-Api-Key' instead of the required Bearer token scheme.
+  high   api-reference.md: Create project table omits required field 'ownerEmail'.
+  medium api-reference.md: List projects query param documented as 'perPage', but the true API uses 'limit'.
+  …14 more…
+[26.0s]  Fixer: rewriting docs…
+[53.5s]  Validator: redocly lint example/docs/openapi.yaml
+[54.9s]  Fixer: updated 3 files
+[54.9s]  Reporter: writing the pull request…
+
+Token usage and cost
+  scanner    1 calls     2795 in     598 out  $0.0116
+  auditor    1 calls     3672 in    2320 out  $0.0305
+  fixer      3 calls    16081 in    3015 out  $0.0623
+  reporter   1 calls     5960 in     841 out  $0.0203
+  TOTAL                                      $0.1248
+  runtime 66.0s
+```
+
+It found all six planted drifts, plus four `rules.md` violations the code alone could not
+reveal (endpoints with no runnable curl example). Note `fixer 3 calls` — that is the tool loop
+billing per step, which is exactly what `src/cost.test.ts` guards.
+
+### A note on AI Gateway's free tier
+
+The free tier covers a subset of models and rate-limits them separately per model. The two
+failure modes look similar but are not: HTTP 403 `no_providers_available` means the model is
+**not** in the free subset, while HTTP 429 `rate_limit_exceeded` means it is, but you are
+throttled right now. `--model` exists partly so you can move to a model with spare quota.
 
 ## Why a CLI
 
