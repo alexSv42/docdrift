@@ -16,16 +16,23 @@ export const repoRoot = (cwd: string): string =>
 export const currentBranch = (cwd: string): string =>
   run('git', ['branch', '--show-current'], cwd).trim();
 
-/** Paths, relative to the repo root, that differ from HEAD. */
-export const changedPaths = (cwd: string): string[] =>
-  run('git', ['status', '--porcelain'], cwd)
+/**
+ * Every git operation is scoped to a path, and callers pass the documentation directory.
+ *
+ * docdrift only ever edits docs, so a repo-wide scope is both wrong and dangerous: `git diff` would
+ * describe unrelated work in the pull request body, `git add -A` would commit it, and `revert`
+ * would destroy it. Nothing outside `scope` is docdrift's to read or to throw away.
+ */
+export const changedPaths = (cwd: string, scope: string): string[] =>
+  run('git', ['status', '--porcelain', '--', scope], cwd)
     .split('\n')
     .filter(Boolean)
     .map((line) => line.slice(3));
 
-export const diff = (cwd: string): string => run('git', ['diff'], cwd);
+export const diff = (cwd: string, scope: string): string => run('git', ['diff', '--', scope], cwd);
 
-export const revert = (cwd: string): void => void run('git', ['checkout', '--', '.'], cwd);
+export const revert = (cwd: string, scope: string): void =>
+  void run('git', ['checkout', '--', scope], cwd);
 
 /* --------------------------------------------------------------- validator */
 
@@ -52,6 +59,18 @@ export function redoclyCli(): string {
   }
 }
 
+/**
+ * Whether a document can be linted on its own, i.e. it declares a specification version at the
+ * top level rather than being a fragment `$ref`d from somewhere else.
+ *
+ * This distinction is not cosmetic. Redocly resolves `$ref`s, so linting the root validates the
+ * whole tree and reports problems against the *partial's* own path and line numbers — everything
+ * a repair needs. Linting a partial directly exits non-zero with `Unsupported specification`,
+ * which is a usage error, not a documentation error. Handing that text to an agent as if it were
+ * invalid OpenAPI is how correct work gets reverted.
+ */
+export const isSpecRoot = (content: string): boolean => /^(openapi|swagger|asyncapi):/m.test(content);
+
 /** Lint OpenAPI/AsyncAPI documents with the Redocly CLI. Never throws — the caller repairs. */
 export function lint(cwd: string, specs: readonly string[]): LintResult {
   const { status, stdout, stderr } = spawnSync(
@@ -64,13 +83,13 @@ export function lint(cwd: string, specs: readonly string[]): LintResult {
 
 /* ------------------------------------------------------------ pull request */
 
-/** Commit the working tree on a new branch, push it, and open a PR. Returns the PR URL. */
+/** Commit the documentation changes on a new branch, push it, and open a PR. Returns the PR URL. */
 export function openPullRequest(
   cwd: string,
-  pr: { branch: string; title: string; body: string; base: string },
+  pr: { branch: string; title: string; body: string; base: string; scope: string },
 ): string {
   run('git', ['checkout', '-b', pr.branch], cwd);
-  run('git', ['add', '-A'], cwd);
+  run('git', ['add', '--', pr.scope], cwd);
   run('git', ['commit', '-m', pr.title], cwd);
   run('git', ['push', '-u', 'origin', pr.branch], cwd);
   const url = run(

@@ -1,130 +1,26 @@
+# Root document. The only file here with an `openapi:` key — which is what makes it the only file
+# Redocly can lint directly. Everything else is reached through $ref.
 openapi: 3.1.0
 info:
   title: Projects API
   version: 1.0.0
   description: Manage projects.
 servers:
-  - url: https://api.example.com
+  - url: https://api.example.com/v3
 security:
-  - ApiKeyAuth: []
+  - BearerAuth: []
 paths:
-  /v1/projects:
-    post:
-      operationId: createProject
-      summary: Create a project
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [name]
-              properties:
-                name:
-                  type: string
-                status:
-                  $ref: '#/components/schemas/ProjectStatus'
-      responses:
-        '201':
-          description: The created project.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
-    get:
-      operationId: listProjects
-      summary: List projects
-      parameters:
-        - name: status
-          in: query
-          schema:
-            $ref: '#/components/schemas/ProjectStatus'
-        - name: perPage
-          in: query
-          description: Page size, 1-100.
-          schema:
-            type: integer
-            default: 20
-        - name: cursor
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A page of projects.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Project'
-                  nextCursor:
-                    type: [string, 'null']
-  /v1/projects/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      operationId: getProject
-      summary: Get a project
-      responses:
-        '200':
-          description: The project.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
-    patch:
-      operationId: updateProject
-      summary: Update a project
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                status:
-                  $ref: '#/components/schemas/ProjectStatus'
-                isArchived:
-                  type: boolean
-      responses:
-        '200':
-          description: The updated project.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
+  /v3/projects:
+    $ref: './paths/projects.yaml'
+  /v3/projects/{id}:
+    $ref: './paths/project-by-id.yaml'
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-Api-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
   schemas:
     ProjectStatus:
-      type: string
-      enum: [active, paused, completed]
+      $ref: './components/schemas/project-status.yaml'
     Project:
-      type: object
-      required: [id, name, status, createdAt]
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        status:
-          $ref: '#/components/schemas/ProjectStatus'
-        isArchived:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
+      $ref: './components/schemas/project.yaml'

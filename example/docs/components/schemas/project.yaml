@@ -1,0 +1,17 @@
+# Partial: the Project schema, two directories deep and referencing a sibling partial.
+type: object
+required: [id, name, status, createdAt]
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  ownerEmail:
+    type: string
+  status:
+    $ref: './project-status.yaml'
+  archived:
+    type: boolean
+  createdAt:
+    type: string
+    format: date-time

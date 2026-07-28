@@ -16,10 +16,10 @@ const call = (inputTokens: number, outputTokens: number, usd?: string) => ({
 });
 
 it('bills a single call once', () => {
-  llm.record('scanner', call(100, 20, '0.0010'));
+  llm.record('explorer', call(100, 20, '0.0010'));
 
   expect(llm.ledger()).toEqual([
-    { agent: 'scanner', calls: 1, inputTokens: 100, outputTokens: 20, usd: 0.001 },
+    { agent: 'explorer', calls: 1, inputTokens: 100, outputTokens: 20, usd: 0.001 },
   ]);
 });
 
@@ -50,7 +50,7 @@ it('treats a provider that reports no cost as free rather than NaN', () => {
 });
 
 it('totals cost across agents', () => {
-  llm.record('scanner', call(100, 20, '0.0110'));
+  llm.record('explorer', call(100, 20, '0.0110'));
   llm.record('auditor', call(200, 40, '0.0220'));
 
   expect(llm.totalUsd()).toBeCloseTo(0.033, 10);

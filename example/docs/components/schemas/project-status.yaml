@@ -1,0 +1,3 @@
+# Partial: the leaf of the $ref chain — root → paths/*.yaml → project.yaml → here.
+type: string
+enum: [active, paused, completed]
