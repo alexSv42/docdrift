@@ -2,29 +2,29 @@
 
 ## Authentication
 
-Every request must carry your API key in the `X-Api-Key` header.
+Every request must carry your API key in the `Authorization` header as a Bearer token.
 
 ```bash
-curl https://api.example.com/v1/projects \
-  -H "X-Api-Key: $API_KEY"
+curl https://api.example.com/v2/projects \
+  -H "Authorization: Bearer $API_KEY"
 ```
 
 ## Your first project
 
 ```bash
-curl -X POST https://api.example.com/v1/projects \
-  -H "X-Api-Key: $API_KEY" \
+curl -X POST https://api.example.com/v2/projects \
+  -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name":"Apollo"}'
+  -d '{"name":"Apollo","ownerEmail":"owner@example.com"}'
 ```
 
 ## Paging
 
-Pass `perPage` to control the page size, then follow `nextCursor`:
+Pass `limit` to control the page size, then follow `nextCursor`:
 
 ```bash
-curl "https://api.example.com/v1/projects?perPage=50&cursor=prj_50" \
-  -H "X-Api-Key: $API_KEY"
+curl "https://api.example.com/v2/projects?limit=50&cursor=prj_50" \
+  -H "Authorization: Bearer $API_KEY"
 ```
 
 ## Next steps
