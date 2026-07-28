@@ -5,7 +5,7 @@
   "type": "module",
   "bin": { "docdrift": "./src/cli.ts" },
   "scripts": {
-    "docdrift": "tsx src/cli.ts",
+    "docdrift": "tsx --env-file-if-exists=.env src/cli.ts",
     "typecheck": "tsc --noEmit",
     "test": "tsx src/cost.test.ts"
   },
