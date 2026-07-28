@@ -1,0 +1,23 @@
+{
+  "name": "docdrift",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": { "docdrift": "./src/cli.ts" },
+  "scripts": {
+    "docdrift": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/cost.test.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/gateway": "^2",
+    "ai": "^5",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2",
+    "@types/node": "^24",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}
