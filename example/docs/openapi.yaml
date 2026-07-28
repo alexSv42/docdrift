@@ -6,9 +6,9 @@ info:
 servers:
   - url: https://api.example.com
 security:
-  - ApiKeyAuth: []
+  - BearerAuth: []
 paths:
-  /v1/projects:
+  /v2/projects:
     post:
       operationId: createProject
       summary: Create a project
@@ -18,9 +18,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [name]
+              required: [name, ownerEmail]
               properties:
                 name:
+                  type: string
+                ownerEmail:
                   type: string
                 status:
                   $ref: '#/components/schemas/ProjectStatus'
@@ -39,7 +41,7 @@ paths:
           in: query
           schema:
             $ref: '#/components/schemas/ProjectStatus'
-        - name: perPage
+        - name: limit
           in: query
           description: Page size, 1-100.
           schema:
@@ -63,7 +65,7 @@ paths:
                       $ref: '#/components/schemas/Project'
                   nextCursor:
                     type: [string, 'null']
-  /v1/projects/{id}:
+  /v2/projects/{id}:
     parameters:
       - name: id
         in: path
@@ -94,7 +96,7 @@ paths:
                   type: string
                 status:
                   $ref: '#/components/schemas/ProjectStatus'
-                isArchived:
+                archived:
                   type: boolean
       responses:
         '200':
@@ -103,12 +105,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
+    delete:
+      operationId: deleteProject
+      summary: Delete a project
+      responses:
+        '204':
+          description: The project was deleted.
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-Api-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
   schemas:
     ProjectStatus:
       type: string
@@ -121,9 +128,11 @@ components:
           type: string
         name:
           type: string
+        ownerEmail:
+          type: string
         status:
           $ref: '#/components/schemas/ProjectStatus'
-        isArchived:
+        archived:
           type: boolean
         createdAt:
           type: string
