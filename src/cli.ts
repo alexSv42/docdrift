@@ -10,6 +10,7 @@ import {
   diff,
   lint,
   openPullRequest,
+  redoclyCli,
   repoRoot,
   revert,
   type LintResult,
@@ -82,6 +83,7 @@ async function main(): Promise<number> {
   if (!process.env['AI_GATEWAY_API_KEY']) {
     throw new Error('AI_GATEWAY_API_KEY is not set. See .env.example.');
   }
+  redoclyCli(); // Fail before spending a token: the Validator is not optional.
 
   const root = repoRoot(process.cwd());
   const codeDir = resolve(values.code);

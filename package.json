@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "^2",
+    "@redocly/cli": "^2",
     "ai": "^5",
     "zod": "^3"
   },
   "devDependencies": {
-    "@redocly/cli": "^2",
     "@types/node": "^24",
     "tsx": "^4",
     "typescript": "^5",

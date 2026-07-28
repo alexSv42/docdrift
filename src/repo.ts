@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 
 /** Run a command, returning stdout. Throws with the command's own stderr on failure. */
 function run(cmd: string, args: readonly string[], cwd: string): string {
@@ -33,12 +34,31 @@ export interface LintResult {
   output: string;
 }
 
+/**
+ * Absolute path to the Redocly CLI inside *docdrift's own* dependencies.
+ *
+ * Deliberately not `npx`: npx resolves against the current working directory, so on a target
+ * repo without @redocly/cli it exits non-zero with "npx canceled due to missing packages".
+ * `lint()` would have reported that as a lint failure, and the orchestrator would have fed
+ * npm's error text to the Fixer as if it were invalid OpenAPI — burning both repair attempts
+ * on nonsense and then reverting correct work. A missing linter is an install problem and must
+ * never be able to look like a documentation problem.
+ */
+export function redoclyCli(): string {
+  try {
+    return createRequire(import.meta.url).resolve('@redocly/cli/bin/cli.js');
+  } catch {
+    throw new Error('@redocly/cli could not be resolved. Run `npm install` in docdrift.');
+  }
+}
+
 /** Lint OpenAPI/AsyncAPI documents with the Redocly CLI. Never throws — the caller repairs. */
 export function lint(cwd: string, specs: readonly string[]): LintResult {
-  const { status, stdout, stderr } = spawnSync('npx', ['--no-install', 'redocly', 'lint', ...specs], {
-    cwd,
-    encoding: 'utf8',
-  });
+  const { status, stdout, stderr } = spawnSync(
+    process.execPath,
+    [redoclyCli(), 'lint', ...specs],
+    { cwd, encoding: 'utf8' },
+  );
   return { ok: status === 0, output: `${stdout}${stderr}`.trim() };
 }
 

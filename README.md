@@ -115,6 +115,14 @@ can be done in one shot:
   cannot disagree.
 - **Whole files go in the prompt.** No chunking, no embeddings, no retrieval. Correct and simple
   for a service-sized repo; see *Limits*.
+- **A broken toolchain must never look like a documentation problem.** The Validator resolves the
+  Redocly CLI out of docdrift's own `node_modules` (`createRequire(import.meta.url).resolve`) and
+  runs it with `process.execPath`. `npx` would resolve against the *target* repo, and on a repo
+  without `@redocly/cli` it exits non-zero printing `npx canceled due to missing packages` — which
+  `lint()` would have returned as a lint failure, and the orchestrator would have fed to the Fixer
+  as if it were invalid OpenAPI. It would have burned both repair attempts on npm's error text and
+  then reverted correct work. `redoclyCli()` is also called at the top of `main()`, so a missing
+  linter fails before a single token is spent.
 - **Four agents are four functions.** No base class, no registry, no plugin system.
 
 `src/` is about 300 lines in four files: `cli.ts` (orchestrator), `agents.ts` (the four agents and
@@ -166,8 +174,8 @@ npm run typecheck   # tsc --noEmit, strict
 npm test            # vitest run
 ```
 
-Nine unit tests over the two pieces of non-obvious deterministic logic. No mocked LLM calls —
-the agents are prompts, and asserting on a stubbed model response would only test the stub.
+Thirteen unit tests over the deterministic logic. No mocked LLM calls — the agents are prompts,
+and asserting on a stubbed model response would only test the stub.
 
 - `src/llm.test.ts` — the cost ledger. The one that matters is *bills a tool loop per step*: a
   multi-step result reports only the last step's cost in its own `providerMetadata`, so billing
@@ -175,3 +183,8 @@ the agents are prompts, and asserting on a stubbed model response would only tes
   each test re-imports the module via `vi.resetModules()` rather than have production code export
   a reset that only tests would call.
 - `src/agents.test.ts` — `readFiles`: recursion, relative paths, multiple extensions, no match.
+- `src/repo.test.ts` — the Validator, against the real Redocly CLI in a temp directory with no
+  `node_modules`. That directory is the point: it is a target repo that has never heard of
+  Redocly, and it is what the `npx` implementation got wrong. One test asserts a genuine spec
+  error is reported, another asserts the output never matches `/npx|npm error|missing packages/`
+  — the two must stay distinguishable.
